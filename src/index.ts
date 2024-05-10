@@ -1,5 +1,4 @@
 //imports
-import e from "express";
 import  express  from "express";
 import * as fs from "fs"
 
@@ -27,6 +26,16 @@ function stringToJSON(name:string , age:string){
     return JSON.stringify([name , age]);
 }
 
+
+
+
+
+
+
+
+
+
+
 //creating routes and adding functionality
 app.get("/test",(req,res)=>{
     res.send("This is a test")
@@ -41,14 +50,30 @@ app.get("/upload/:name/:age", (req,res)=>{
 
 //file data-fetch
 app.get("/fetch/:name" , (req,res)=>{
-    const path = __dirname + "/resources/" + req.params.name + ".json"
-    fs.readFile(path , "utf-8",(err,data)=>{
+    const path = __dirname + "/resources/" + req.params.name +".json";
+    
+    
+    fs.readFile(path , "utf-8",(err , data)=>{
         if (err){
-            console.error(err);
-            res.status(500).send("<h1>ERROR</h1>")
-            return
+            res.status(404).send("<h1>Not found</h1>")
         }
-        res.send(JSON.parse(data))
+        res.send(data)
+    } )
+      
+})
+
+app.get("/update/:name/:age" , (req,res)=>{
+    const data = stringToJSON(req.params.name , req.params.age);
+    res.send(createFile(req.params.name,data) ? "Data Updated" : "Entry Failed")
+})
+
+app.get("/delete/:name" , (req,res)=>{
+    const path = __dirname + "/resources/" + req.params.name + ".json"
+    fs.unlink(path, (err)=>{
+        if(err){
+            res.status(500).send("<h1>File not deleted</h1>")
+        }
+        res.send("File deleted")
     })
 })
 
